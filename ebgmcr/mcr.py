@@ -266,7 +266,7 @@ class EBSelectiveMCR(nn.Module):
     @langevin_steps.setter
     def langevin_steps(self, langevin_steps):
         assert isinstance(langevin_steps, int)
-        assert langevin_steps >= 1
+        assert langevin_steps >= 0
 
         self._langevin_steps = langevin_steps
         self.component_sparsity.langevin_steps = langevin_steps

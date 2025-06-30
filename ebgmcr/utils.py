@@ -177,13 +177,16 @@ class EnergyL1Scheduler:
         if nMSE >= self.nmse_margin or used_components == 0:
             target_coef = 0.0
         else:
-            # Compute the “raw” target so that:
-            #   λ1 * (used/total) ≈ MSE * ratio
-            frac = used_components / self.N_total
-            # Avoid division by zero; we know used_components>0 here.
-            raw = MSE * self.target_ratio / frac
-            # We never allow λ1 to go negative.
-            target_coef = max(0.0, raw)
+            if self.target_ratio > 0.:
+                # Compute the “raw” target so that:
+                #   λ1 * (used/total) ≈ MSE * ratio
+                frac = used_components / self.N_total
+                # Avoid division by zero; we know used_components>0 here.
+                raw = MSE * self.target_ratio / frac
+                # We never allow λ1 to go negative.
+                target_coef = max(0.0, raw)
+            else:
+                target_coef = 0.0
 
         # Smooth by EMA: new_lambda1 = β * old + (1-β) * target
         self.coef = self.beta * self.coef + (1.0 - self.beta) * target_coef

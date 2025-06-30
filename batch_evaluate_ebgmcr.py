@@ -396,7 +396,7 @@ def main():
         single_ebgmcr_config['langevin_steps'] = args.langevin_steps
 
         for args_name in combination_ebgmcr[ebgmcr_idx]:
-            if args_name in ebgmcr_config.keys():
+            if args_name in single_ebgmcr_config.keys():
                 single_ebgmcr_config[args_name] = combination_ebgmcr[ebgmcr_idx][args_name]
 
         ebgmcr_configs.append(single_ebgmcr_config)

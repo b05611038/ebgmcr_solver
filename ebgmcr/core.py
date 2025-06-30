@@ -30,14 +30,17 @@ class LangevinRefinedEnergyModule(nn.Module):
         self.num_steps = int(num_steps)
 
     def forward(self, energy):
-        total_noise = self.noise_scale * torch.randn_like(energy) * \
-                (self.num_steps ** 0.5)
+        if self.num_steps > 0:
+            total_noise = self.noise_scale * torch.randn_like(energy) * \
+                    (self.num_steps ** 0.5)
 
-        energy.requires_grad_(True)
-        gradients = torch.autograd.grad(energy.sum(), energy, create_graph = True)[0]
+            energy.requires_grad_(True)
+            gradients = torch.autograd.grad(energy.sum(), energy, create_graph = True)[0]
 
-        if self.training:
-            refined_energy = energy - self.step_size * self.num_steps * gradients + total_noise
+            if self.training:
+                refined_energy = energy - self.step_size * self.num_steps * gradients + total_noise
+            else:
+                refined_energy = energy
         else:
             refined_energy = energy
 
@@ -79,7 +82,7 @@ class FixedEBSelectiveModule(EBSelectiveModule):
             tau = 0.1,
             langevin_step_size = 0.05,
             langevin_nosie = 0.1,
-            langevin_steps = 16):
+            langevin_steps = 32):
 
         super(FixedEBSelectiveModule, self).__init__(
                 tau = tau,

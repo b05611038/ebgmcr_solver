@@ -276,7 +276,7 @@ class BaseEBgMCR(abc.ABC):
     @langevin_steps.setter
     def langevin_steps(self, langevin_steps):
         assert isinstance(langevin_steps, int)
-        assert langevin_steps > 0
+        assert langevin_steps >= 0
         self._langevin_steps = langevin_steps
         if self.stored_mcrs is not None:
             for mcr in self.stored_mcrs:
