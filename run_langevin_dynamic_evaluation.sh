@@ -1,4 +1,6 @@
 #!/bin/bash
+# Example script for evaluating Langevin dynamic mechanism in EB-gMCR
+
 OUTPUT_DIR="langevin_dynamic_evaluations"
 DEVICE="${1:--1}"
 REPEAT_TIME=5

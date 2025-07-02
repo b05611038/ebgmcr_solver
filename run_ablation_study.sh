@@ -1,7 +1,9 @@
 #!/bin/bash
+# Example script for evaluating each mechanism in EB-gMCR
+
 OUTPUT_DIR="ablation_study"
 DEVICE="${1:--1}"
-REPEAT_TIME=3
+REPEAT_TIME=5
 MAX_GLOBAL_EPOCH=100000
 MAX_LOCAL_EPOCH=100000
 

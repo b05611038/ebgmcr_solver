@@ -1,4 +1,6 @@
 #!/bin/bash
+# Example script for evaluating component number prediction
+
 OUTPUT_DIR="component_number_evaluations"
 DEVICE="${1:--1}"
 REPEAT_TIME=5
