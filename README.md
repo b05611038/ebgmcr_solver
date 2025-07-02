@@ -1,10 +1,10 @@
 # EB-gMCR: Energy-Based Generative Multivariate Curve Resolution
 
-Multivariate Curve Resolution (MCR),  aims to decompose mixtures of signals into their latent components and concentartions under non-unique and ill-posed settings. Traditional MCR methods typically rely on matrix factorization techniques such as MCR-ALS or NMF, which may struggle when the number of components becomes very large, data size is extremely large. Our proposed **EB-gMCR** framework leverages generative deep learning and variational optimization to provide a flexible and scalable solver for challenging large-scale MCR problems.
+Multivariate Curve Resolution (MCR), aims to decompose mixtures of signals into their latent components and concentartions under non-unique and ill-posed settings. Traditional MCR methods typically rely on matrix factorization techniques such as MCR-ALS or NMF, which may struggle when the number of components becomes very large, data size is extremely large. Our proposed **EB-gMCR** framework leverages generative deep learning and variational optimization to provide a flexible and scalable solver for challenging large-scale MCR problems.
 
 ## 🔍 Main Result Highlights
 
-The figure below summarizes the performance of EB-gMCR under strict testing conditions. The main target is checking accuracy of evaluated comopoennt number, becasue the solver is started from using over-paramterized components and auto-dropped by DL sovler itself. The solver is capable of accurately estimating over 256 components, and performed better when data number is large (because of its DL-based design). To our knowledge, this is the first solver that demonstrates reliable MCR behavior in such extreme settings.
+The figure below summarizes the performance of EB-gMCR under strict testing conditions. The main goal is to evaluate the accuracy of component number estimation, starting from over-parameterized initial guesses that are pruned by the solver itself. EB-gMCR successfully estimates 256 components and performs better when the data size is large (thanks to its DL-based design). To our knowledge, this is the first solver that demonstrates reliable MCR behavior under such extreme conditions.
 
 ![Main Result](./main_result.jpg)
 
