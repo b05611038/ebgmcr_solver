@@ -1,3 +1,6 @@
+import os
+import pandas as pd
+
 import torch
 import torch.nn as nn
 
@@ -6,7 +9,7 @@ import torch.nn as nn
 #--------------------------------------------------------------------------------
 
 
-__all__ = ['RandomComponentMixtureSynthesizer']
+__all__ = ['RandomComponentMixtureSynthesizer', 'CsvComponentMixtureLoader']
 
 
 def _safe_mask_for_sparse_components(source_components, sparsity):
@@ -327,5 +330,78 @@ class RandomComponentMixtureSynthesizer:
             self.device = device
 
         return self.generate(sample_number, separation_mode = separation_mode)
+
+
+class CsvComponentMixtureLoader:
+    """
+    Load D, C, S from CSVs and return as torch.FloatTensors.
+
+    CSVs are expected under `data_dir/`:
+      - carbs_D_spectra.csv         (21 × 1401)
+      - carbs_C_concentrations.csv  (21 ×   3)
+      - carbs_S_endmembers.csv      (1401 ×  4) [wavenumber + 3 comp spectra]
+      - nir_D_spectra.csv           (166 ×  235)
+      - nir_C_concentrations.csv    (166 ×   2)
+    
+    On call(batch_size=None, dataset="carbs"|"nir"), returns (D, C, S) tensors:
+
+      D: [batch_size, n_wavelengths]  
+      C: [batch_size, n_components]  
+      S: [n_wavelengths, n_components]  
+
+    If batch_size > available samples, raises ValueError.
+    """
+
+    def __init__(self, data_dir = "real_dataset"):
+        self.data_dir = data_dir
+        # mapping dataset name → (D_csv, C_csv, S_csv or None)
+        self._map = {
+            "carbs": (
+                "carbs_D_spectra.csv",
+                "carbs_C_concentrations.csv",
+                "carbs_S_endmembers.csv"
+            ),
+            "nir": (
+                "nir_D_spectra.csv",
+                "nir_C_concentrations.csv",
+                None  # no S available for nir
+            )
+        }
+
+    def __call__(self, batch_size = None, dataset = "carbs", device = "cpu"):
+        if dataset not in self._map:
+            raise ValueError(f"Unknown dataset '{dataset}'; choose from {list(self._map)}")
+        
+        D_file, C_file, S_file = self._map[dataset]
+        D_df = pd.read_csv( os.path.join(self.data_dir, D_file) )
+        C_df = pd.read_csv( os.path.join(self.data_dir, C_file) )
+
+        D = torch.from_numpy(D_df.values).float()
+        C = torch.from_numpy(C_df.values).float()
+
+        # handle S if available
+        if S_file is not None:
+            S_df = pd.read_csv( os.path.join(self.data_dir, S_file) )
+            # assume first column is wavelength → drop it
+            S = torch.from_numpy( S_df.iloc[:,1:].values ).float()
+        else:
+            # compute S by pseudoinverse: S = (C^+ D)^T
+            # NOTE: this gives S as [n_waves × n_components]
+            pinvC = torch.pinverse(C)
+            S = (pinvC @ D).t()
+
+        N = D.shape[0]
+        if batch_size is None or batch_size == N:
+            idx = torch.arange(N)
+        elif batch_size < N:
+            idx = torch.randperm(N)[:batch_size]
+        else:
+            raise ValueError(f"batch_size={batch_size} > number of samples={N}")
+
+        D_batch = D[idx].to(device)
+        C_batch = C[idx].to(device)
+        S       = S.to(device)
+
+        return D_batch, C_batch, S
 
 
