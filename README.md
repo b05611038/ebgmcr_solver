@@ -1,27 +1,36 @@
 # EB-gMCR: Energy-Based Generative Multivariate Curve Resolution
 
-Multivariate Curve Resolution (MCR), aims to decompose mixtures of signals into their latent components and concentartions under non-unique and ill-posed settings. Traditional MCR methods typically rely on matrix factorization techniques such as MCR-ALS or NMF, which may struggle when the number of components becomes very large, data size is extremely large. Our proposed **EB-gMCR** framework leverages generative deep learning and variational optimization to provide a flexible and scalable solver for challenging large-scale MCR problems.
+📄 **ArXiv Preprint:** [EB-gMCR: Energy-Based Generative Modeling for Signal Unmixing and Multivariate Curve Resolution](https://arxiv.org/abs/2507.23600v1)
 
-## 🔍 Main Result Highlights
+Multivariate Curve Resolution (MCR) aims to decompose mixtures of signals into their latent components and concentrations under non-unique and ill-posed settings. Traditional MCR methods typically rely on matrix factorization techniques such as MCR-ALS or NMF, which may struggle when the number of components becomes very large or data sizes are extremely large. Our proposed **EB-gMCR** framework leverages generative deep learning and variational optimization to provide a flexible and scalable solver for challenging large-scale MCR problems.
 
-The figure below summarizes the performance of EB-gMCR under strict testing conditions. The main goal is to evaluate the accuracy of component number estimation, starting from over-parameterized initial guesses that are pruned by the solver itself. EB-gMCR successfully estimates 256 components and performs better when the data size is large (thanks to its DL-based design). To our knowledge, this is the first solver that demonstrates reliable MCR behavior under such extreme conditions.
+## 🔑 Features
 
-![Main Result](./main_result.jpg)
+* Automatic component selection via differentiable energy-based gating
+* Scalable to large pools of candidate spectra (e.g., N≫10)
+* Supports noisy and large-scale datasets
+* Built on PyTorch to leverage GPU acceleration
 
-This main result is fixed and robust across trials. Benchmarking against classical methods is currently under preparation for our upcoming manuscript.
+## 📦 Installation
+
+```bash
+git clone https://github.com/b05611038/ebgmcr_solver
+cd ebgmcr_solver
+pip install -r requirements.txt
+```
 
 ## 🚀 How to Use
 
 You can apply the EB-gMCR solver in just a few lines:
 
-```python script
+```python
 >>> import torch
 >>> from ebgmcr import RandomComponentMixtureSynthesizer, DenseEBgMCR
->>> data_generator = RandomComponentMixtureSynthesizer(component_number=16, 
-...                                                    component_dim=512, 
-...                                                    non_negative_component=True, 
-...                                                    min_concentration=1., 
-...                                                    max_concentration=10., 
+>>> data_generator = RandomComponentMixtureSynthesizer(component_number=16,
+...                                                    component_dim=512,
+...                                                    non_negative_component=True,
+...                                                    min_concentration=1.,
+...                                                    max_concentration=10.,
 ...                                                    signal_to_nosie_ratio=20.) # SNR in dB
 >>> data = data_generator(64) # 4N dataset
 >>> solver = DenseEBgMCR(num_components=1024, dim_components=512, mini_batch_size=16, device = torch.device('cuda:0'))
@@ -49,8 +58,26 @@ Successfully checkpoint result to file:outputs/0.975[->]0.98/result.csv.
 dict_keys(['reconstruction', 'concentration', 'components', 'select_prob'])
 ```
 
+## 📖 Citation
+
+You can use the following BibTeX entry, which follows the formal arXiv recommendation:
+
+```bibtex
+@misc{chang2025ebgmcr,
+  title        = {EB-gMCR: Energy-Based Generative Modeling for Signal Unmixing and Multivariate Curve Resolution},
+  author       = {Chang, Yu-Tang and Others},
+  year         = {2025},
+  eprint       = {2507.23600v1},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.LG}
+}
+```
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check [issues](https://github.com/b05611038/ebgmcr_solver/issues) and [pull requests](https://github.com/b05611038/ebgmcr_solver/pulls).
+
 ## 🛡 License
 
 This repository is released under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-This is a research prototype. Use at your own risk. For inquiries about commercial use, please contact the author.
