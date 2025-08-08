@@ -3,3 +3,6 @@ pandas
 torch
 safetensors
 tensorboard
+scipy
+scikit-learn
+chemometrics
