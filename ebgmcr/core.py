@@ -30,14 +30,13 @@ class LangevinRefinedEnergyModule(nn.Module):
         self.num_steps = int(num_steps)
 
     def forward(self, energy):
-        if self.num_steps > 0:
-            total_noise = self.noise_scale * torch.randn_like(energy) * \
-                    (self.num_steps ** 0.5)
+        if self.training:
+            if self.num_steps > 0:
+                total_noise = self.noise_scale * torch.randn_like(energy) * \
+                        (self.num_steps ** 0.5)
 
-            energy.requires_grad_(True)
-            gradients = torch.autograd.grad(energy.sum(), energy, create_graph = True)[0]
-
-            if self.training:
+                energy.requires_grad_(True)
+                gradients = torch.autograd.grad(energy.sum(), energy, create_graph = True)[0]
                 refined_energy = energy - self.step_size * self.num_steps * gradients + total_noise
             else:
                 refined_energy = energy
