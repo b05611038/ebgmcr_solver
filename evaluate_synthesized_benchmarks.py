@@ -47,10 +47,12 @@ def NMF_baseline(data, n_components, l1_ratio = 0.0, alpha = 0.0, max_iter = NMF
               random_state = 0)
 
     concentration = nmf.fit_transform(data)
-    esitmated_components = nmf.components_
-    reconstructed_data = concentration @ esitmated_components
+    estimated_components = nmf.components_
+    reconstructed_data = concentration @ estimated_components
 
-    return reconstructed_data
+    return {'reconstruction': reconstructed_data,
+            'concentration': concentration,
+            'compoent': estimated_components}
 
 def SparseNMF_baseline(data, n_components, sparsity = 0.8, max_iter = NMF_max_iter, alpha = 1e-2):
     nmf = NMF(n_components = n_components,
@@ -64,10 +66,12 @@ def SparseNMF_baseline(data, n_components, sparsity = 0.8, max_iter = NMF_max_it
               random_state = 0)
 
     concentration = nmf.fit_transform(data)
-    esitmated_components = nmf.components_
-    reconstructed_data = concentration @ esitmated_components
+    estimated_components = nmf.components_
+    reconstructed_data = concentration @ estimated_components
 
-    return reconstructed_data
+    return {'reconstruction': reconstructed_data,
+            'concentration': concentration,
+            'compoent': estimated_components}
 
 def BayesNMF_baseline(data, n_components, max_iter = NMF_max_iter):
     nmf = NMF(n_components = n_components,
@@ -79,10 +83,12 @@ def BayesNMF_baseline(data, n_components, max_iter = NMF_max_iter):
               random_state = 0)
 
     concentration = nmf.fit_transform(data)
-    esitmated_components = nmf.components_
-    reconstructed_data = concentration @ esitmated_components
+    estimated_components = nmf.components_
+    reconstructed_data = concentration @ estimated_components
 
-    return reconstructed_data
+    return {'reconstruction': reconstructed_data,
+            'concentration': concentration,
+            'compoent': estimated_components}
 
 def ICA_baseline(data, n_components, max_iter = ICA_max_iter):
     ica = FastICA(n_components = n_components,
@@ -115,7 +121,9 @@ def ICA_baseline(data, n_components, max_iter = ICA_max_iter):
     estimated_components[estimated_components < 0.] = 0.
     reconstructed_data = concentration @ estimated_components
 
-    return reconstructed_data
+    return {'reconstruction': reconstructed_data,
+            'concentration': concentration,
+            'compoent': estimated_components}
 
 def MCR_ALS_baseline(data, n_components, max_iter = MCR_ALS_max_iter):
     c_init = np.abs(TruncatedSVD(n_components = n_components).fit_transform(data))
@@ -133,7 +141,9 @@ def MCR_ALS_baseline(data, n_components, max_iter = MCR_ALS_max_iter):
 
     reconstructed_data = concentration @ estimated_components
 
-    return reconstructed_data
+    return {'reconstruction': reconstructed_data,
+            'concentration': concentration,
+            'compoent': estimated_components}
 
 def search_baselines(data, true_component_number,
                      search_ratios = [1.2, 1.15, 1.1, 1.05, 1., 0.95, 0.9, 0.85, 0.8],
@@ -142,7 +152,7 @@ def search_baselines(data, true_component_number,
     baseline_result = {'NMF': None, 'Sparse-NMF': None, 'Bayes-NMF': None, 'ICA': None, 'MCR-ALS': None}
     for ratio in search_ratios:
         search_component_number = int(true_component_number * ratio)
-        nmf_reconstruction = NMF_baseline(data, search_component_number)
+        nmf_reconstruction = NMF_baseline(data, search_component_number)['reconstruction']
         nmf_result = criterions(data, nmf_reconstruction)
         nmf_result['component_number'] = search_component_number
         nmf_success = False
@@ -161,7 +171,7 @@ def search_baselines(data, true_component_number,
                     if nmf_result['R2'] > baseline_result['NMF']['R2']:
                          baseline_result['NMF'] = nmf_result
 
-        sparse_nmf_reconstruction = SparseNMF_baseline(data, search_component_number)
+        sparse_nmf_reconstruction = SparseNMF_baseline(data, search_component_number)['reconstruction']
         sparse_nmf_result = criterions(data, sparse_nmf_reconstruction)
         sparse_nmf_result['component_number'] = search_component_number
         sparse_nmf_success = False
@@ -180,7 +190,7 @@ def search_baselines(data, true_component_number,
                     if sparse_nmf_result['R2'] > baseline_result['Sparse-NMF']['R2']:
                         baseline_result['Sparse-NMF'] = sparse_nmf_result
 
-        bayes_nmf_reconstruction = BayesNMF_baseline(data, search_component_number)
+        bayes_nmf_reconstruction = BayesNMF_baseline(data, search_component_number)['reconstruction']
         bayes_nmf_result = criterions(data, bayes_nmf_reconstruction)
         bayes_nmf_result['component_number'] = search_component_number
         bayes_nmf_success = False
@@ -199,7 +209,7 @@ def search_baselines(data, true_component_number,
                     if bayes_nmf_result['R2'] > baseline_result['Bayes-NMF']['R2']:
                         baseline_result['Bayes-NMF'] = bayes_nmf_result
 
-        ica_reconstruction = ICA_baseline(data, search_component_number)
+        ica_reconstruction = ICA_baseline(data, search_component_number)['reconstruction']
         ica_result = criterions(data, ica_reconstruction)
         ica_result['component_number'] = search_component_number
         ica_success = False
@@ -218,7 +228,7 @@ def search_baselines(data, true_component_number,
                     if ica_result['R2'] > baseline_result['ICA']['R2']:
                         baseline_result['ICA'] = ica_result
 
-        mcr_als_reconstruction = MCR_ALS_baseline(data, search_component_number)
+        mcr_als_reconstruction = MCR_ALS_baseline(data, search_component_number)['reconstruction']
         mcr_als_result = criterions(data, mcr_als_reconstruction)
         mcr_als_result['component_number'] = search_component_number
         mcr_als_success = False
