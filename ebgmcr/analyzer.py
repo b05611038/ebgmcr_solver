@@ -1285,6 +1285,7 @@ class DenseEBgMCR(BaseEBgMCR):
             if f.endswith('.json'):
                 has_param_file = True
 
+        dim_components = None
         if has_model_file and has_param_file:
             mcr = EBSelectiveMCR(1, 1).from_pretrained(path)
             self.stored_mcrs = nn.ModuleList([mcr])
@@ -1294,11 +1295,20 @@ class DenseEBgMCR(BaseEBgMCR):
                 sub_path = os.path.join(path, sub_path)
                 if os.path.isdir(sub_path):
                     mcr = EBSelectiveMCR(1, 1).from_pretrained(sub_path)
+                    if dim_components is None:
+                        dim_components = mcr.dim_components
+                    else:
+                        assert dim_components == mcr.dim_components
+
                     mcrs.append(mcr)
 
             self.stored_mcrs = nn.ModuleList(mcrs)
 
         self.stored_mcrs = self.stored_mcrs.to(self.device)
+        if dim_components is None:
+            self.dim_components = self.stored_mcrs[0].dim_components
+        else:
+            self.dim_components = dim_components
 
         return None
 

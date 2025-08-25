@@ -68,6 +68,11 @@ def prepare_dataset(dataset_name, data_dir = 'real_dataset'):
             array = df.to_numpy()
             if key == 'D' and dataset_name =='carbs':
                 array = np.flip(array, axis = 1)
+            elif key == 'S':
+                if dataset_name == 'carbs':
+                    array = array[:, 1:] # skip the wavelegnth header line
+
+                array = array.transpose(1, 0)
 
             array = torch.from_numpy(np.ascontiguousarray(array)).to(torch.float32)
         else:

@@ -46,13 +46,23 @@ def NMF_baseline(data, n_components, l1_ratio = 0.0, alpha = 0.0, max_iter = NMF
               max_iter = max_iter,
               random_state = 0)
 
-    concentration = nmf.fit_transform(data)
-    estimated_components = nmf.components_
-    reconstructed_data = concentration @ estimated_components
+    if (data < 0).sum() > 0:
+        data_positive = np.maximum(data, 0)
+        data_negative = np.maximum(-data, 0)
+        augmented_data = np.concatenate([data_positive, data_negative], axis=1)
+        concentration = nmf.fit_transform(augmented_data)
+        estimated_components = nmf.components_
+        pos, neg = np.split(estimated_components, 2, axis=1)
+        estimated_components = pos - neg
+        reconstructed_data = concentration @ pos - concentration @ neg
+    else:
+        concentration = nmf.fit_transform(data)
+        estimated_components = nmf.components_
+        reconstructed_data = concentration @ estimated_components
 
     return {'reconstruction': reconstructed_data,
             'concentration': concentration,
-            'compoent': estimated_components}
+            'component': estimated_components}
 
 def SparseNMF_baseline(data, n_components, sparsity = 0.8, max_iter = NMF_max_iter, alpha = 1e-2):
     nmf = NMF(n_components = n_components,
@@ -65,13 +75,23 @@ def SparseNMF_baseline(data, n_components, sparsity = 0.8, max_iter = NMF_max_it
               max_iter = max_iter,
               random_state = 0)
 
-    concentration = nmf.fit_transform(data)
-    estimated_components = nmf.components_
-    reconstructed_data = concentration @ estimated_components
+    if (data < 0).sum() > 0:
+        data_positive = np.maximum(data, 0)
+        data_negative = np.maximum(-data, 0)
+        augmented_data = np.concatenate([data_positive, data_negative], axis=1)
+        concentration = nmf.fit_transform(augmented_data)
+        estimated_components = nmf.components_
+        pos, neg = np.split(estimated_components, 2, axis=1)
+        estimated_components = pos - neg
+        reconstructed_data = concentration @ pos - concentration @ neg
+    else:
+        concentration = nmf.fit_transform(data)
+        estimated_components = nmf.components_
+        reconstructed_data = concentration @ estimated_components
 
     return {'reconstruction': reconstructed_data,
             'concentration': concentration,
-            'compoent': estimated_components}
+            'component': estimated_components}
 
 def BayesNMF_baseline(data, n_components, max_iter = NMF_max_iter):
     nmf = NMF(n_components = n_components,
@@ -82,13 +102,23 @@ def BayesNMF_baseline(data, n_components, max_iter = NMF_max_iter):
               max_iter = max_iter,
               random_state = 0)
 
-    concentration = nmf.fit_transform(data)
-    estimated_components = nmf.components_
-    reconstructed_data = concentration @ estimated_components
+    if (data < 0).sum() > 0:
+        data_positive = np.maximum(data, 0)
+        data_negative = np.maximum(-data, 0)
+        augmented_data = np.concatenate([data_positive, data_negative], axis=1)
+        concentration = nmf.fit_transform(augmented_data)
+        estimated_components = nmf.components_
+        pos, neg = np.split(estimated_components, 2, axis=1)
+        estimated_components = pos - neg
+        reconstructed_data = concentration @ pos - concentration @ neg
+    else:
+        concentration = nmf.fit_transform(data)
+        estimated_components = nmf.components_
+        reconstructed_data = concentration @ estimated_components
 
     return {'reconstruction': reconstructed_data,
             'concentration': concentration,
-            'compoent': estimated_components}
+            'component': estimated_components}
 
 def ICA_baseline(data, n_components, max_iter = ICA_max_iter):
     ica = FastICA(n_components = n_components,
@@ -123,7 +153,7 @@ def ICA_baseline(data, n_components, max_iter = ICA_max_iter):
 
     return {'reconstruction': reconstructed_data,
             'concentration': concentration,
-            'compoent': estimated_components}
+            'component': estimated_components}
 
 def MCR_ALS_baseline(data, n_components, max_iter = MCR_ALS_max_iter):
     c_init = np.abs(TruncatedSVD(n_components = n_components).fit_transform(data))
@@ -143,7 +173,7 @@ def MCR_ALS_baseline(data, n_components, max_iter = MCR_ALS_max_iter):
 
     return {'reconstruction': reconstructed_data,
             'concentration': concentration,
-            'compoent': estimated_components}
+            'component': estimated_components}
 
 def search_baselines(data, true_component_number,
                      search_ratios = [1.2, 1.15, 1.1, 1.05, 1., 0.95, 0.9, 0.85, 0.8],

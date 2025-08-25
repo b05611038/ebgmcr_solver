@@ -5,7 +5,6 @@ from pathlib import Path
 
 import numpy as np
 
-from ebgmcr.eval import StreamingMetrics
 from ebgmcr.utils import init_directory
 
 from run_real_ebgmcr import prepare_dataset
